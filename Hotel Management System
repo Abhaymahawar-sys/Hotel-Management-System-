@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Hotel Management System</title>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2683e6;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+
+        .form-container {
+            display: none;
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+
+        #guestList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #guestList li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+
+        #searchResult {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #searchResult li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+
+        #totalChargeResult {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+
+        #presentGuestsCount,
+        #totalGuestsCount {
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+
+        select,
+        button {
+            transition: 0.3s;
+        }
+
+        select:hover,
+        button:hover {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        .form-container h2 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .form-container label {
+            color: #333;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <script>
+        const password = "password";
+        const enteredPassword = prompt("Enter the password:");
+        if (enteredPassword !== null && enteredPassword === password) {
+            document.body.style.display = "block";
+        } else {
+            alert("Incorrect password. Access denied.");
+            document.body.style.display = "none";
+        }
+    </script>
+    <h1> Hotel Management System</h1>
+    <label for="choice">
+        <h3>Choose an Option: </h3>
+    </label>
+    <select id="choice">
+        <option value="0">Select an Option</option>
+        <option value="1">Add Guest</option>
+        <option value="2">Delete Guest</option>
+        <option value="3">Display Guest</option>
+        <option value="4">Total Charge</option>
+        <option value="5">Search Guest</option>
+        <option value="6">Guest Present In Hotel</option>
+        <option value="7">Update Charges</option>
+        <option value="8">Exit </option>
+    </select>
+
+    <button onclick="handleChoice()">>Submit</button>
+
+
+    <div id="addGuestForm" style="display: none;">
+        <h2> Add Guest </h2>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="phone">Phone Number:</label>
+        <input type="text" id="phone" name="phone" required><br><br>
+
+        <label for="checkInDate">Check-in Date:</label>
+        <input type="text" id="checkInDate" name="checkInDate" required><br><br>
+
+        <label for="roomCharge">Room Charge:</label>
+        <input type="text" id="roomCharge" name="roomCharge" required><br><br>
+
+        <label for="foodCharge">Food Charge:</label>
+        <input type="text" id="foodCharge" name="foodCharge" required><br><br>
+
+        <label for="gymCharge">Gym Charge:</label>
+        <input type="text" id="gymCharge" name="gymCharge" required><br><br>
+
+        <label for="extraCharge">Extra Charge:</label>
+        <input type="text" id="extraCharge" name="extraCharge" required><br><br>
+
+        <button onclick="saveGuest()">Save Guest</button>
+    </div>
+
+    <div id="deleteGuestForm" style="display: none;">
+        <h2> Delete Guest </h2>
+        <label for="deleteName">Enter Guest Name To Delete: </label>
+        <input type="text" id="deleteName" name="deleteName" required><br><br>
+        <button onclick="deleteGuest()">Delete Guest</button>
+    </div>
+
+    <div id="displayGuestForm" style="display: none;">
+        <h2>Guest List</h2>
+        <ol id="guestList"></ol>
+
+    </div>
+
+    <div id="guestPresentInHotel" style="display: none;">
+        <h2>Guests Present in Hotel</h2>
+        <p id="presentGuestsCount"></p>
+        <p id="totalGuestsCount"></p>
+    </div>
+
+    <div id="totalCharge" style="display: none;">
+        <h2>Total Charge</h2>
+        <label for="totalChargeName">Enter Guest Name: </label>
+        <input type="text" id="totalChargeName" name="totalChargeName" required><br><br>
+        <button onclick="calculateTotalCharge()">Calculate Total Charge</button>
+        <p id="totalChargeResult"></p>
+    </div>
+
+    <div id="searchGuest" style="display: none;">
+        <h2> Search Guest </h2>
+        <label for="searchName">Enter Guest Name To Search: </label>
+        <input type="text" id="searchName" name="searchName" required><br><br>
+        <button onclick="searchGuest()">Search Guest</button>
+        <ul id="searchResult"></ul>
+    </div>
+
+    <div id="guestPresentInHotel" style="display: none;">
+        <h2>Guests Present in Hotel</h2>
+        <p id="presentGuestsCount"></p>
+    </div>
+
+    <div id="updateCharge" style="display: none;">
+        <h2> Update Guest Charges </h2>
+        <label for="updateName">Enter Guest Name: </label>
+        <input type="text" id="updateName" name="updateName" required><br><br>
+
+        <label for="additionalCharge">Additional Charge:</label>
+        <input type="text" id="additionalCharge" name="additionalCharge" required><br><br>
+
+        <button onclick="updateCharge()">Update Charges</button>
+    </div>
+
+    <script>
+        let guests = JSON.parse(localStorage.getItem('guests')) || [];
+        function handleChoice() {
+            const choice = document.getElementById('choice').value;
+            switch (choice) {
+                case '1':
+                    document.getElementById('addGuestForm').style.display = 'block';
+                    break;
+                case '2':
+                    document.getElementById('deleteGuestForm').style.display = 'block';
+                    break;
+                case '3':
+                    document.getElementById('displayGuestForm').style.display = 'block';
+                    break;
+                case '4':
+                    document.getElementById('totalCharge').style.display = 'block';
+                    break;
+                case '5':
+                    document.getElementById('searchGuest').style.display = 'block';
+                    break;
+                case '6':
+                    document.getElementById('guestPresentInHotel').style.display = 'block';
+                    displayTotalGuests();
+                    break;
+                case '7':
+                    document.getElementById('updateCharge').style.display = 'block';
+                    updateCharge();
+                    break;
+                default:
+                    exit;
+                    break;
+            }
+        }
+
+        function displayForm(formId) {
+    const forms = document.getElementsByTagName('div');
+    for (let i = 0; i < forms.length; i++) {
+        if (forms[i].id === formId) {
+            forms[i].style.display = 'block';
+        } else {
+            forms[i].style.display = 'none';
+        }
+    }
+}
+
+        function saveGuest() {
+            const guestInfo = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                checkInDate: document.getElementById('checkInDate').value,
+                roomCharge: document.getElementById('roomCharge').value,
+                foodCharge: document.getElementById('foodCharge').value,
+                gymCharge: document.getElementById('gymCharge').value,
+                extraCharge: document.getElementById('extraCharge').value
+            };
+            guests.push(guestInfo);
+            localStorage.setItem('guests', JSON.stringify(guests));
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('checkInDate').value = '';
+            document.getElementById('roomCharge').value = '';
+            document.getElementById('foodCharge').value = '';
+            document.getElementById('gymCharge').value = '';
+            document.getElementById('extraCharge').value = '';
+            console.log("Guest added:", guestInfo);
+            displayGuests();
+        }
+
+
+        function deleteGuest() {
+            const guestName = document.getElementById('deleteName').value.trim().toLowerCase();
+            let guestFound = false;
+            if (guestName !== '') {
+                console.log('Guests before deletion:', guests); // Log guests before deletion
+                for (let i = 0; i < guests.length; i++) {
+                    const storedGuestName = guests[i].name.toLowerCase();
+                    if (storedGuestName === guestName) {
+                        // Delete the guest if found
+                        guests.splice(i, 1);
+                        guestFound = true;
+                        console.log(`Guest '${guestName}' information deleted successfully.`);
+                        alert(`Guest '${guestName}' deleted successfully!`);
+                        break;
+                    }
+                }
+                console.log('Guests after deletion:', guests); // Log guests after deletion
+                if (!guestFound) {
+                    console.log(`Guest '${guestName}' is not present in the hotel.`);
+                    alert(`Guest '${guestName}' is not present in the hotel.`);
+                } else {
+                    localStorage.setItem('guests', JSON.stringify(guests));
+                }
+                document.getElementById('deleteName').value = '';
+            } else {
+                console.log('Please enter a guest name to delete.');
+                alert('Please enter a guest name to delete.');
+            }
+            displayGuests();
+        }
+
+        function displayGuests() {
+            const guestsList = document.getElementById('guestList');
+            guestsList.innerHTML = '';
+            let guests = JSON.parse(localStorage.getItem('guests')) || [];
+            console.log('Stored Guests:', guests);
+            if (guests.length > 0) {
+                guests.forEach(guest => {
+                    const li = document.createElement('li');
+                    li.textContent = `Name: ${guest.name}, Phone: ${guest.phone}, Check-in Date: ${guest.checkInDate}`;
+                    guestsList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No guests found.';
+                guestsList.appendChild(li);
+            }
+        }
+        window.onload = function () {
+            displayGuests();
+        };
+
+        function calculateTotalCharge() {
+            const guestName = document.getElementById('totalChargeName').value.trim().toLowerCase();
+            const totalChargeResult = document.getElementById('totalChargeResult');
+
+            let guestFound = false;
+            let totalCharge = 0;
+
+            guests.forEach(guest => {
+                const storedGuestName = guest.name.toLowerCase();
+                if (storedGuestName === guestName) {
+                    // Calculate total charge if guest found
+                    guestFound = true;
+                    totalCharge = parseFloat(guest.roomCharge) + parseFloat(guest.foodCharge) +
+                        parseFloat(guest.gymCharge) + parseFloat(guest.extraCharge);
+                }
+            });
+
+            if (guestFound) {
+                totalChargeResult.textContent = `Total charge for ${guestName}: $${totalCharge.toFixed(2)}`;
+            } else {
+                totalChargeResult.textContent = `Guest '${guestName}' not found.`;
+            }
+
+            clearInputFields();
+        }
+
+        function clearInputFields() {
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('checkInDate').value = '';
+            document.getElementById('roomCharge').value = '';
+            document.getElementById('foodCharge').value = '';
+            document.getElementById('gymCharge').value = '';
+            document.getElementById('extraCharge').value = '';
+            document.getElementById('deleteName').value = '';
+            document.getElementById('totalChargeName').value = '';
+        }
+
+        window.onload = function () {
+            displayGuests();
+        };
+
+        function searchGuest() {
+            const searchName = document.getElementById('searchName').value.trim().toLowerCase();
+            let searchResult = [];
+
+            if (searchName !== '') {
+                let guests = JSON.parse(localStorage.getItem('guests')) || [];
+
+                guests.forEach(guest => {
+                    const storedGuestName = guest.name.toLowerCase();
+                    if (storedGuestName.includes(searchName)) {
+                        searchResult.push(guest);
+                    }
+                });
+
+                const searchResultList = document.getElementById('searchResult');
+                searchResultList.innerHTML = '';
+
+                if (searchResult.length > 0) {
+                    searchResult.forEach(result => {
+                        const li = document.createElement('li');
+                        li.textContent = `Name: ${result.name}, Phone: ${result.phone}, Check-in Date: ${result.checkInDate}`;
+                        searchResultList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'No matching guests found.';
+                    searchResultList.appendChild(li);
+                }
+            } else {
+                alert('Please enter a guest name to search.');
+            }
+        }
+
+        function countPresentGuests() {
+            let presentGuests = 0;
+            let guests = JSON.parse(localStorage.getItem('guests')) || [];
+            guests.forEach(guest => {
+                if (!guest.checked_out) {
+                    presentGuests++;
+                }
+            });
+            return presentGuests;
+        }
+
+        window.onload = function () {
+            displayGuests();
+        };
+
+        function displayTotalGuests() {
+            const totalGuestsCount = guests.length;
+            document.getElementById('totalGuestsCount').textContent = `Total Number of Guests: ${totalGuestsCount}`;
+        }
+
+        function updateCharge() {
+            const guestName = prompt("Enter Guest Name to Update Charges:");
+            const additionalCharge = parseFloat(prompt("Enter Additional Charge:"));
+
+            let guestFound = false;
+
+            if (guestName !== null && !isNaN(additionalCharge)) {
+                guests.forEach(guest => {
+                    if (guest.name.toLowerCase() === guestName.trim().toLowerCase()) {
+                        // Update charges if guest found
+                        guest.roomCharge = (parseFloat(guest.roomCharge) + additionalCharge).toFixed(2);
+                        guest.foodCharge = (parseFloat(guest.foodCharge) + additionalCharge).toFixed(2);
+                        guest.gymCharge = (parseFloat(guest.gymCharge) + additionalCharge).toFixed(2);
+                        guest.extraCharge = (parseFloat(guest.extraCharge) + additionalCharge).toFixed(2);
+                        guestFound = true;
+                        alert(`Charges updated successfully for ${guestName}.`);
+                    }
+                });
+
+                if (!guestFound) {
+                    alert(`Guest '${guestName}' not found.`);
+                } else {
+                    // Update local storage after modifying charges
+                    localStorage.setItem('guests', JSON.stringify(guests));
+                }
+
+                clearInputFields();
+            } else {
+                alert("Invalid input. Please enter valid guest name and additional charge.");
+            }
+        }
+
+    </script>
+</body>
+
+</html>
